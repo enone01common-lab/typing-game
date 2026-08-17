@@ -1,0 +1,23 @@
+--- index.html
++++ index.html
+@@ -573,11 +573,11 @@
+       {"kanji": "ツチノコ<ruby>発見<rt>はっけん</rt></ruby>！？", "romaji": "tutinokohakken!?", "img": "cryptid,snake"}
+     ],
+     "25": [
+-      {"kanji": "Level 25: The Ultimate Challenge!!", "romaji": "level 25: the ultimate challenge!!", "img": "challenge,boss"},
+-      {"kanji": "1, 2, 3... Are you ready for the BOSS?", "romaji": "1, 2, 3... are you ready for the boss?", "img": "boss,fight"},
+-      {"kanji": "Animal vs Plant vs Dinosaur vs Cryptid!", "romaji": "animal vs plant vs dinosaur vs cryptid!", "img": "evolution"},
++      {"kanji": "レベル25：<ruby>究極<rt>きゅうきょく</rt></ruby>の<ruby>試練<rt>しれん</rt></ruby>！！", "romaji": "reberu25:kyuukyokunosiren!!", "img": "challenge,boss"},
++      {"kanji": "1, 2, 3... ボスと<ruby>戦<rt>たたか</rt></ruby>う<ruby>準備<rt>じゅんび</rt></ruby>はいいか？", "romaji": "1, 2, 3... bosutotatakaujunbihaiika?", "img": "boss,fight"},
++      {"kanji": "<ruby>動物<rt>どうぶつ</rt></ruby> vs <ruby>植物<rt>しょくぶつ</rt></ruby> vs <ruby>恐竜<rt>きょうりゅう</rt></ruby> vs UMA！", "romaji": "doubutu vs syokubutu vs kyouryuu vs uma!", "img": "evolution"},
+       {"kanji": "<ruby>生命<rt>せいめい</rt></ruby>の<ruby>誕生<rt>たんじょう</rt></ruby>：46<ruby>億年<rt>おくねん</rt></ruby>の<ruby>歴史<rt>れきし</rt></ruby>", "romaji": "seimeinotanjou:46okunennorekisi", "img": "history,earth"},
+-      {"kanji": "function evolution() { return \"Super!\"; }", "romaji": "function evolution() { return \"super!\"; }", "img": "biology,science"},
++      {"kanji": "function <ruby>進化<rt>しんか</rt></ruby>() { return \"スーパー！\"; }", "romaji": "function sinka() { return \"su-pa-!\"; }", "img": "biology,science"},
+       {"kanji": "【<ruby>究極<rt>きゅうきょく</rt></ruby>】すべての<ruby>命<rt>いのち</rt></ruby>は<ruby>海<rt>うみ</rt></ruby>から<ruby>始<rt>はじ</rt></ruby>まった", "romaji": "[kyuukyoku]subetenoinotihaumikarahazimatta", "img": "ocean,origin"},
+-      {"kanji": "~~~~~~DNA Spiral~~~~~~", "romaji": "~~~~~~dna spiral~~~~~~", "img": "dna,helix"},
+-      {"kanji": "http://www.ultimate-biology-typing.com/", "romaji": "http://www.ultimate-biology-typing.com/", "img": "internet,network"},
+-      {"kanji": "$Earth$ - The blue planet of life.", "romaji": "$earth$ - the blue planet of life.", "img": "earth,planet"},
++      {"kanji": "~~~~~~DNAの<ruby>二重<rt>にじゅう</rt></ruby>らせん~~~~~~", "romaji": "~~~~~~dnanonizyuurasen~~~~~~", "img": "dna,helix"},
++      {"kanji": "http://www.<ruby>究極生物<rt>きゅうきょくせいぶつ</rt></ruby>タイピング.com/", "romaji": "http://www.kyuukyokuseibututaipingu.com/", "img": "internet,network"},
++      {"kanji": "$<ruby>地球<rt>ちきゅう</rt></ruby>$ - <ruby>生命<rt>せいめい</rt></ruby>あふれる<ruby>青<rt>あお</rt></ruby>い<ruby>星<rt>ほし</rt></ruby>", "romaji": "$tikyuu$ - seimeiafureruaoihosi", "img": "earth,planet"},
+       {"kanji": "<ruby>祝<rt>しゅく</rt></ruby>★<ruby>全<rt>ぜん</rt></ruby>250<ruby>問完全制覇<rt>もんかんぜんせいは</rt></ruby>！<ruby>真<rt>しん</rt></ruby>の<ruby>生物王<rt>せいぶつおう</rt></ruby>だ！！！", "romaji": "syuku*zen250monkanzenseiha!sinnoseibutuouda!!!", "img": "champion,king"}

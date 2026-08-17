@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>いきものタイピング</title>
+<meta name="description" content="動物や植物の名前を楽しく学べる無料のタイピングゲーム「いきものタイピング」。全20レベルでタイピングスキルを鍛えよう！">
+<meta name="keywords" content="タイピング,タイピングゲーム,いきもの,動物,植物,無料,ブラウザゲーム,タイピング練習">
+<meta property="og:title" content="いきものタイピング">
+<meta property="og:description" content="動物や植物の名前を楽しく学べる無料のタイピングゲーム「いきものタイピング」。全20レベルでタイピングスキルを鍛えよう！">
+<meta property="og:type" content="website">
+<style>
+  :root {
+    --primary: #ff8fa3;
+    --primary-hover: #ff748c;
+    --secondary: #a0c4ff;
+    --bg-color: #fdfbfb;
+    --text-main: #4a4a4a;
+    --text-light: #9ca3af;
+    --correct-color: #ff4757;
+  }
+  
+  * { 
+    box-sizing: border-box; 
+    font-family: 'Zen Maru Gothic', 'Hiragino Rounded W3 JIS2004', 'Meiryo', sans-serif; 
+  }
+  
+  body {
+    font-family: 'Hiragino Maru Gothic ProN', 'Rounded M+ 1c', 'Meiryo', sans-serif;
+    background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: var(--text-main);
+  }
+  
+  .bg-image {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-size: cover;
+    background-position: center;
+    z-index: -1;
+    opacity: 0.4;
+    transition: background-image 0.5s ease-in-out;
+    pointer-events: none;
+  }
+  
+  .container {
+    background: rgba(255, 255, 255, 0.95);
+    width: 90%;
+    max-width: 650px;
+    border-radius: 30px;
+    padding: 40px 30px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  h1 { 
+    margin-top: 0; 
+    color: var(--primary); 
+    font-size: 28px; 
+  }
+  
+  .level-selector {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+  }
+  
+  .level-btn {
+    background: #f1f2f6;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 20px;
+    font-size: 16px;
+    cursor: pointer;
+    color: var(--text-light);
+    font-weight: bold;
+    transition: all 0.2s;
+  }
+  
+  .level-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  }
+
+  .level-btn.active {
+    background: var(--primary);
+    color: white;
+    box-shadow: 0 5px 15px rgba(255, 143, 163, 0.4);
+  }
+  
+  .level-btn.cleared {
+    background: #d1d8e0;
+    color: white;
+  }
+
+  .level-btn.cleared.active {
+    background: var(--primary);
+  }
+  
+  .status {
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--text-light);
+    margin-bottom: 20px;
+  }
+  
+  .word-display {
+    font-size: 48px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    min-height: 70px;
+    color: var(--text-main);
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
+    word-break: break-all;
+    line-height: 1.4;
+  }
+  
+  rt {
+    color: var(--text-light);
+    font-size: 18px;
+    font-weight: bold;
+  }
+  
+  .romaji-display {
+    font-size: 36px;
+    letter-spacing: 4px;
+    margin-bottom: 30px;
+    color: var(--text-light);
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+    word-break: break-all;
+    line-height: 1.4;
+  }
+  
+  .romaji-display .typed {
+    color: var(--correct-color);
+    font-weight: bold;
+  }
+  
+  .input-area {
+    margin-bottom: 20px;
+  }
+  
+  input[type="text"] {
+    width: 80%;
+    font-size: 24px;
+    padding: 15px 20px;
+    border: 3px solid #e1e8ed;
+    border-radius: 15px;
+    text-align: center;
+    outline: none;
+    transition: border-color 0.2s, transform 0.1s;
+    font-family: 'Courier New', Courier, monospace;
+    color: var(--correct-color);
+    font-weight: bold;
+    background: #f8f9fa;
+  }
+  
+  input[type="text"]:focus {
+    border-color: var(--secondary);
+    background: white;
+  }
+  
+  .message-area {
+    min-height: 50px;
+  }
+  
+  .btn-next {
+    background: var(--secondary);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 25px;
+    cursor: pointer;
+    display: none;
+    margin: 0 auto;
+    transition: transform 0.2s;
+    box-shadow: 0 5px 15px rgba(160, 196, 255, 0.4);
+  }
+  
+  .btn-next:hover {
+    transform: scale(1.05);
+  }
+  
+  .confetti {
+    position: fixed;
+    top: -10px;
+    width: 15px;
+    height: 15px;
+    z-index: 9999;
+    animation: fall linear forwards;
+    border-radius: 4px;
+  }
+  
+  @keyframes fall {
+    to { transform: translateY(105vh) rotate(720deg); }
+  }
+  
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); border-color: #ff6b81; }
+    75% { transform: translateX(5px); border-color: #ff6b81; }
+  }
+  
+  .shake { animation: shake 0.2s; }
+  
+  .btn-reset {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    font-size: 13px;
+    padding: 6px 12px;
+    background-color: #ffffff;
+    color: #888888;
+    border: 1px solid #cccccc;
+    border-radius: 6px;
+    cursor: pointer;
+    opacity: 0.9;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    transition: all 0.2s;
+  }
+  .btn-reset:hover {
+    opacity: 1;
+    background-color: #ffeeee;
+    color: #cc0000;
+    border-color: #cc0000;
+  }
+  
+  .timer-display {
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--correct-color);
+    margin-top: -10px;
+    margin-bottom: 15px;
+  }
+</style>
+</head>
+<body>
+<div id="bg-image" class="bg-image"></div>
+<button id="btn-reset" class="btn-reset">データ初期化</button>
+
+<div class="container">
+  <h1>🌱 いきものタイピング 🐾</h1>
+  <div class="level-selector" id="level-selector">
+    <!-- ボタンはJSで生成 -->
+  </div>
+  
+  <div class="status" id="status">レベル 1 - 問題 1 / 10</div>
+  <div class="timer-display" id="timer-display" style="display:none;"></div>
+  
+  <div class="word-display" id="word-display">開始ボタンを押してね</div>
+  <div class="romaji-display" id="romaji-display"></div>
+  
+  <div class="input-area">
+    <input type="text" id="type-input" placeholder="ここに入力..." autocomplete="off" spellcheck="false" disabled>
+  </div>
+  
+  <div class="message-area">
+    <button class="btn-next" id="btn-next">次のレベルへ進む</button>
+  </div>
+</div>
+
+<script>
+  const typingData = {
+    "1": [
+      {"kanji": "あ（<ruby>鮎<rt>あゆ</rt></ruby>）", "romaji": "a", "img": "ayu,fish"},
+      {"kanji": "い（イカ）", "romaji": "i", "img": "squid"},
+      {"kanji": "う（<ruby>鵜<rt>う</rt></ruby>）", "romaji": "u", "img": "cormorant"},
+      {"kanji": "え（<ruby>海老<rt>えび</rt></ruby>）", "romaji": "e", "img": "shrimp"},
+      {"kanji": "お（オキアミ）", "romaji": "o", "img": "krill"},
+      {"kanji": "か（<ruby>蚊<rt>か</rt></ruby>）", "romaji": "ka", "img": "mosquito"},
+      {"kanji": "く（<ruby>蜘蛛<rt>くも</rt></ruby>）", "romaji": "ku", "img": "spider"},
+      {"kanji": "け（<ruby>毛虫<rt>けむし</rt></ruby>）", "romaji": "ke", "img": "caterpillar"},
+      {"kanji": "こ（<ruby>鯉<rt>こい</rt></ruby>）", "romaji": "ko", "img": "koi,carp"},
+      {"kanji": "さ（<ruby>鮭<rt>さけ</rt></ruby>）", "romaji": "sa", "img": "salmon"}
+    ],
+    "2": [
+      {"kanji": "いえ（イエバエ）", "romaji": "ie", "img": "housefly"},
+      {"kanji": "しか（<ruby>鹿<rt>しか</rt></ruby>）", "romaji": "sika", "img": "deer"},
+      {"kanji": "たこ（<ruby>蛸<rt>たこ</rt></ruby>）", "romaji": "tako", "img": "octopus"},
+      {"kanji": "ねこ（<ruby>猫<rt>ねこ</rt></ruby>）", "romaji": "neko", "img": "cat"},
+      {"kanji": "いぬ（<ruby>犬<rt>いぬ</rt></ruby>）", "romaji": "inu", "img": "dog"},
+      {"kanji": "くま（<ruby>熊<rt>くま</rt></ruby>）", "romaji": "kuma", "img": "bear"},
+      {"kanji": "とり（<ruby>鳥<rt>とり</rt></ruby>）", "romaji": "tori", "img": "bird"},
+      {"kanji": "さる（<ruby>猿<rt>さる</rt></ruby>）", "romaji": "saru", "img": "monkey"},
+      {"kanji": "うま（<ruby>馬<rt>うま</rt></ruby>）", "romaji": "uma", "img": "horse"},
+      {"kanji": "かめ（<ruby>亀<rt>かめ</rt></ruby>）", "romaji": "kame", "img": "turtle"}
+    ],
+    "3": [
+      {"kanji": "へび（<ruby>蛇<rt>へび</rt></ruby>）", "romaji": "hebi", "img": "snake"},
+      {"kanji": "ぶた（<ruby>豚<rt>ぶた</rt></ruby>）", "romaji": "buta", "img": "pig"},
+      {"kanji": "ごりら", "romaji": "gorira", "img": "gorilla"},
+      {"kanji": "ぱんだ", "romaji": "panda", "img": "panda"},
+      {"kanji": "かえる", "romaji": "kaeru", "img": "frog"},
+      {"kanji": "いるか", "romaji": "iruka", "img": "dolphin"},
+      {"kanji": "すずめ", "romaji": "suzume", "img": "sparrow"},
+      {"kanji": "からす", "romaji": "karasu", "img": "crow"},
+      {"kanji": "きつね", "romaji": "kitune", "img": "fox"},
+      {"kanji": "たぬき", "romaji": "tanuki", "img": "raccoon"}
+    ],
+    "4": [
+      {"kanji": "らいおん", "romaji": "raion", "img": "lion"},
+      {"kanji": "しまうま", "romaji": "simauma", "img": "zebra"},
+      {"kanji": "ぺんぎん", "romaji": "pengin", "img": "penguin"},
+      {"kanji": "あざらし", "romaji": "azarasi", "img": "seal"},
+      {"kanji": "だちょう", "romaji": "datyou", "img": "ostrich"},
+      {"kanji": "しろくま", "romaji": "sirokuma", "img": "polarbear"},
+      {"kanji": "にわとり", "romaji": "niwatori", "img": "chicken"},
+      {"kanji": "ひつじ", "romaji": "hituzi", "img": "sheep"},
+      {"kanji": "うさぎ", "romaji": "usagi", "img": "rabbit"},
+      {"kanji": "めだか", "romaji": "medaka", "img": "killifish"}
+    ],
+    "5": [
+      {"kanji": "かぶとむし", "romaji": "kabutomusi", "img": "beetle"},
+      {"kanji": "きつつき", "romaji": "kitutuki", "img": "woodpecker"},
+      {"kanji": "かまきり", "romaji": "kamakiri", "img": "mantis"},
+      {"kanji": "みつばち", "romaji": "mitubati", "img": "honeybee"},
+      {"kanji": "ありくい", "romaji": "arikui", "img": "anteater"},
+      {"kanji": "ふくろう", "romaji": "fukurou", "img": "owl"},
+      {"kanji": "つばめ", "romaji": "tubame", "img": "swallow"},
+      {"kanji": "こうもり", "romaji": "koumori", "img": "bat"},
+      {"kanji": "かわせみ", "romaji": "kawasemi", "img": "kingfisher"},
+      {"kanji": "まんぼう", "romaji": "manbou", "img": "sunfish"}
+    ],
+    "6": [
+      {"kanji": "かぶとむし(オス)", "romaji": "kabutomusi(osu)", "img": "beetle"},
+      {"kanji": "てんとうむし★", "romaji": "tentoumusi*", "img": "ladybug"},
+      {"kanji": "ちょうちょう〜", "romaji": "tyoutyou~", "img": "butterfly"},
+      {"kanji": "じんべえざめ！", "romaji": "zinbeezame!", "img": "whaleshark"},
+      {"kanji": "たつのおとしご？", "romaji": "tatunootosigo?", "img": "seahorse"},
+      {"kanji": "【はしびろこう】", "romaji": "[hasibirokou]", "img": "shoebill"},
+      {"kanji": "いそぎんちゃく...", "romaji": "isogintyaku...", "img": "anemone"},
+      {"kanji": "うーぱー＆るーぱー", "romaji": "uーpaー&ruーpaー", "img": "axolotl"},
+      {"kanji": "えりまきとかげ!?", "romaji": "erimakitokage!?", "img": "frilledlizard"},
+      {"kanji": "だいおういか。", "romaji": "daiouika.", "img": "giantsquid"}
+    ],
+    "7": [
+      {"kanji": "ねこ-いぬ", "romaji": "neko-inu", "img": "cat,dog"},
+      {"kanji": "サメ<ruby>注意<rt>ちゅうい</rt></ruby>！！", "romaji": "sametyuui!!", "img": "shark"},
+      {"kanji": "パンダ？ or コアラ？", "romaji": "panda? or koara?", "img": "panda,koala"},
+      {"kanji": "100% ライオン！", "romaji": "100% raion!", "img": "lion"},
+      {"kanji": "*ウミガメ*", "romaji": "*umigame*", "img": "seaturtle"},
+      {"kanji": "ペンギン No.1", "romaji": "pengin no.1", "img": "penguin"},
+      {"kanji": "クマ @ <ruby>森<rt>もり</rt></ruby>の<ruby>中<rt>なか</rt></ruby>", "romaji": "kuma @ morinonaka", "img": "bear,forest"},
+      {"kanji": "[ニワトリ] + [ヒヨコ]", "romaji": "[niwatori] + [hiyoko]", "img": "chicken,chick"},
+      {"kanji": "アザラシ...Zzz", "romaji": "azarasi...zzz", "img": "seal"},
+      {"kanji": "カメ vs ウサギ", "romaji": "kame vs usagi", "img": "turtle,rabbit"}
+    ],
+    "8": [
+      {"kanji": "$ゴールデンレトリバー$", "romaji": "$go-rudennretori-ba-$", "img": "goldenretriever"},
+      {"kanji": "サメ: ホホジロザメ！！", "romaji": "same: hohozirozame!!", "img": "greatwhiteshark"},
+      {"kanji": "100% コウテイペンギン", "romaji": "100% kouteipengin", "img": "emperorpenguin"},
+      {"kanji": "#シロナガスクジラ #大海原", "romaji": "#sironagasukujira #ooounabara", "img": "bluewhale,ocean"},
+      {"kanji": "ワシ＆タカ（大空）", "romaji": "wasi&taka (oozora)", "img": "eagle,hawk"},
+      {"kanji": "キングコブラ／ヘビ", "romaji": "kingukobura / hebi", "img": "kingcobra"},
+      {"kanji": "ホッキョクグマ＊氷山＊", "romaji": "hokkyokuguma *hyouzan*", "img": "polarbear,ice"},
+      {"kanji": "&lt;ゴリラ&gt; vs &lt;パンダ&gt;", "romaji": "<gorira> vs <panda>", "img": "gorilla,panda"},
+      {"kanji": "アカキツネ［レベル: 8］", "romaji": "akakitune [reberu: 8]", "img": "redfox"},
+      {"kanji": "“動物”の王国！", "romaji": "\"doubutu\" no oukoku!", "img": "animalkingdom"}
+    ],
+    "9": [
+      {"kanji": "しろながすくじら(30m<ruby>級<rt>きゅう</rt></ruby>)", "romaji": "sironagasukujira(30mkyuu)", "img": "bluewhale"},
+      {"kanji": "ガラパゴス・ゾウガメ", "romaji": "garapagosu-zougame", "img": "galapagostortoise"},
+      {"kanji": "おおさんしょううお!?", "romaji": "oosansyouuo!?", "img": "giantsalamander"},
+      {"kanji": "みなみぞうあざらし＆きたきつね", "romaji": "minamizouazarasi&kitakitune", "img": "elephantseal,fox"},
+      {"kanji": "こもどおおとかげ [<ruby>絶滅危惧種<rt>ぜつめつきぐしゅ</rt></ruby>]", "romaji": "komodoootokage [zetumetukigusyu]", "img": "komododragon"},
+      {"kanji": "ほっきょくぐま vs ペンギン", "romaji": "hokkyokuguma vs pengin", "img": "polarbear,penguin"},
+      {"kanji": "ダイオウグソクムシ(<ruby>深海<rt>しんかい</rt></ruby>)", "romaji": "daiougusokumusi(sinkai)", "img": "giantisopod"},
+      {"kanji": "〜カピバラ<ruby>温泉<rt>おんせん</rt></ruby>〜(<ruby>温<rt>あたた</rt></ruby>かい)", "romaji": "~kapibaraonsen~(atatakai)", "img": "capybara,hotspring"},
+      {"kanji": "マントヒヒの<ruby>群<rt>む</rt></ruby>れ：100<ruby>匹<rt>ひき</rt></ruby>", "romaji": "mantohihinomure:100hiki", "img": "baboon"},
+      {"kanji": "シーラカンスの<ruby>鱗<rt>うろこ</rt></ruby>(ウロコ)", "romaji": "siーrakansunouroko(uroko)", "img": "coelacanth"}
+    ],
+    "10": [
+      {"kanji": "【<ruby>猛毒注意<rt>もうどくちゅうい</rt></ruby>】ヤドクガエル", "romaji": "[moudokutyuui]yadokugaeru", "img": "poisonfrog"},
+      {"kanji": "<ruby>深海生物<rt>しんかいせいぶつ</rt></ruby>：ダイオウイカ / マッコウクジラ", "romaji": "sinkaiseibutu:daiouika/makkoukujira", "img": "giantsquid,spermwhale"},
+      {"kanji": "“<ruby>百獣<rt>ひゃくじゅう</rt></ruby>の<ruby>王<rt>おう</rt></ruby>” ライオン", "romaji": "\"hyakujyuunoou\" raion", "img": "lion"},
+      {"kanji": "<ruby>巨大<rt>きょだい</rt></ruby>ヒグマ & <ruby>ホッキョクグマ<rt>ほっきょくぐま</rt></ruby>", "romaji": "kyodaihiguma & hokkyokuguma", "img": "bear,polarbear"},
+      {"kanji": "<ruby>絶滅危惧種<rt>ぜつめつきぐしゅ</rt></ruby>：ガラパゴスゾウガメ", "romaji": "zetumetukigusyu:garapagosuzougame", "img": "galapagostortoise"},
+      {"kanji": "<ruby>珍獣<rt>ちんじゅう</rt></ruby>：オカピ & カモノハシ", "romaji": "tinyuu:okapi & kamonohasi", "img": "platypus"},
+      {"kanji": "<ruby>鳥類最強<rt>ちょうるいさいきょう</rt></ruby>：オオワシ / ハシビロコウ", "romaji": "tyouruisaikyou:oowasi/hasibirokou", "img": "eagle,shoebill"},
+      {"kanji": "<ruby>海<rt>うみ</rt></ruby>の<ruby>王者<rt>おうじゃ</rt></ruby>：シャチ & ホホジロザメ", "romaji": "uminoouja:syati & hohozirozame", "img": "orca,greatwhiteshark"},
+      {"kanji": "<ruby>大草原<rt>だいそうげん</rt></ruby>：チーター & シマウマ", "romaji": "daisougen:ti-ta- & simauma", "img": "cheetah,zebra"},
+      {"kanji": "【<ruby>恐竜<rt>きょうりゅう</rt></ruby>】ティラノサウルス(T-Rex)", "romaji": "[kyouryuu]tiranosaurusu(t-rex)", "img": "trex,dinosaur"}
+    ],
+    "11": [
+      {"kanji": "【<ruby>猛犬<rt>もうけん</rt></ruby>】ゴールデンレトリバー！", "romaji": "[mouken]go-rudennretori-ba-!", "img": "goldenretriever"},
+      {"kanji": "[Warning] <ruby>巨大<rt>きょだい</rt></ruby>ヒグマ<ruby>出没<rt>しゅつぼつ</rt></ruby>", "romaji": "[warning] kyodaihigumasyutubotu", "img": "brownbear"},
+      {"kanji": "<ruby>一番好<rt>いちばんす</rt></ruby>きな<ruby>動物<rt>どうぶつ</rt></ruby>：ネコ", "romaji": "itibansukinadoubutu:neko", "img": "cat"},
+      {"kanji": "<ruby>幻<rt>まぼろし</rt></ruby>の<ruby>珍獣<rt>ちんじゅう</rt></ruby>を<ruby>探<rt>さが</rt></ruby>せ(Quest:1)", "romaji": "maborosinotinyuuwosagase(quest:1)", "img": "jungle,animal"},
+      {"kanji": "ホッキョクグマを<ruby>救<rt>すく</rt></ruby>え！！", "romaji": "hokkyokugumawosukue!!", "img": "polarbear"},
+      {"kanji": "ネコ<ruby>科最強<rt>かさいきょう</rt></ruby> = トラ or ライオン？", "romaji": "nekokasaikyou = tora or raion?", "img": "tiger,lion"},
+      {"kanji": "Cute!! ウーパールーパー", "romaji": "cute!! uーpaーruーpaー", "img": "axolotl"},
+      {"kanji": "<ruby>深海<rt>しんかい</rt></ruby>の<ruby>神秘<rt>しんぴ</rt></ruby>", "romaji": "sinkainosinpi", "img": "deepsea"},
+      {"kanji": "ようこそ<ruby>動物園<rt>どうぶつえん</rt></ruby>へ！", "romaji": "youkosodoubutuenhe!", "img": "zoo"},
+      {"kanji": "100% <ruby>野生<rt>やせい</rt></ruby>の“<ruby>動物<rt>どうぶつ</rt></ruby>”", "romaji": "100% yaseino\"doubutu\"", "img": "wildanimal"}
+    ],
+    "12": [
+      {"kanji": "ネコ + イヌ = 2<ruby>匹<rt>ひき</rt></ruby>", "romaji": "neko + inu = 2hiki", "img": "cat,dog"},
+      {"kanji": "100<ruby>匹<rt>ひき</rt></ruby>のネコ > 1<ruby>匹<rt>ひき</rt></ruby>のライオン", "romaji": "100hikinoneko > 1hikinoraion", "img": "cat,lion"},
+      {"kanji": "{\"いきもの\": \"パンダ\", \"id\": 1}", "romaji": "{\"ikimono\": \"panda\", \"id\": 1}", "img": "panda"},
+      {"kanji": "配列 = [イヌ, ネコ, トリ]", "romaji": "hairetu = [inu, neko, tori]", "img": "dog,cat,bird"},
+      {"kanji": "ネコ ＋ イヌ ＝ 2<ruby>匹<rt>ひき</rt></ruby>", "romaji": "neko + inu = 2hiki", "img": "cat,dog"},
+      {"kanji": "100<ruby>匹<rt>ひき</rt></ruby>のネコ ＞ 1<ruby>匹<rt>ひき</rt></ruby>のライオン", "romaji": "100hikinoneko > 1hikinoraion", "img": "cat,lion"},
+      {"kanji": "｛“いきもの”： “パンダ”， “id”： 1｝", "romaji": "{'ikimono': 'panda', 'id': 1}", "img": "panda"},
+      {"kanji": "配列 ＝ ［イヌ， ネコ， トリ］", "romaji": "hairetu = [inu, neko, tori]", "img": "dog,cat,bird"},
+      {"kanji": "if (クマ) ｛ 逃げる（）； ｝", "romaji": "if (kuma) { nigeru(); }", "img": "bear,run"},
+      {"kanji": "百獣の王＿ライオン．exe", "romaji": "hyakujyuunoou_raion.exe", "img": "lionking"},
+      {"kanji": "100% ＊ 100% ＝ 最大パワー！！", "romaji": "100% * 100% = saidaipawa-!!", "img": "power,animal"},
+      {"kanji": "＜いきもの＞＜名前＞ネコ＜／名前＞＜／いきもの＞", "romaji": "<ikimono><namae>neko</namae></ikimono>", "img": "cat"},
+      {"kanji": "ユーザー＠動物園サーバー", "romaji": "yu-za-@doubutuensaba-", "img": "server,zoo"},
+      {"kanji": "＃ハッシュタグ ＃動物園 ＃生き物", "romaji": "#hasshutagu #doubutuen #ikimono", "img": "zoo,animals"}
+    ],
+    "13": [
+      {"kanji": "ミクロネシアツカツクリ", "romaji": "mikuronesiatukatukuri", "img": "megapode,bird"},
+      {"kanji": "マダガスカルヒルヤモリ", "romaji": "madagasukaruhiruyamori", "img": "daygecko"},
+      {"kanji": "リュウキュウコノハズク", "romaji": "ryuukyuukonohazuku", "img": "scopsowl"},
+      {"kanji": "トゲアリトゲナシアリ", "romaji": "togearitogenasiari", "img": "ant"},
+      {"kanji": "スベスベマンジュウガニ", "romaji": "subesubemanzyuugani", "img": "crab"},
+      {"kanji": "オオアオイトトンボ", "romaji": "ooaoitotonbo", "img": "damselfly"},
+      {"kanji": "ガラパゴスウミイグアナ", "romaji": "garapagosuumiiguana", "img": "marineiguana"},
+      {"kanji": "カモノハシ(<ruby>卵<rt>たまご</rt></ruby>を<ruby>産<rt>う</rt></ruby>む<ruby>哺乳類<rt>ほにゅうるい</rt></ruby>)", "romaji": "kamonohasi(tamagowoumuhonyuurui)", "img": "platypus"},
+      {"kanji": "シロナガスクジラ(<ruby>地球最大<rt>ちきゅうさいだい</rt></ruby>)", "romaji": "sironagasukujira(tikyuusaidai)", "img": "bluewhale"},
+      {"kanji": "オーストラリアメジロガモ", "romaji": "oosutorariamezirogamo", "img": "duck"}
+    ],
+    "14": [
+      {"kanji": "【S<ruby>級危険生物<rt>きゅうきけんせいぶつ</rt></ruby>】ホホジロザメに<ruby>注意<rt>ちゅうい</rt></ruby>！", "romaji": "[skyuukikenseibutu]hohozirozamenityuui!", "img": "greatwhiteshark"},
+      {"kanji": "<ruby>準備<rt>じゅんび</rt></ruby>はいいか？ 3， 2， 1... スタート！！", "romaji": "zyunbihaiika? 3, 2, 1... suta-to!!", "img": "race,go"},
+      {"kanji": "ネコ vs <ruby>犬<rt>いぬ</rt></ruby> vs <ruby>猿<rt>さる</rt></ruby>", "romaji": "neko vs inu vs saru", "img": "cat,dog,monkey"},
+      {"kanji": "*++(<ruby>生<rt>い</rt></ruby>きものの<ruby>王国<rt>おうこく</rt></ruby>)++*", "romaji": "*++(ikimononooukoku)++*", "img": "animalkingdom"},
+      {"kanji": "！？！？！？<ruby>謎<rt>なぞ</rt></ruby>のUMA<ruby>出現<rt>しゅつげん</rt></ruby>！？！？！？", "romaji": "!?!?!?nazonoumasyutugen!?!?!?", "img": "cryptid,ufo"},
+      {"kanji": "123456789<ruby>匹<rt>ひき</rt></ruby>の...なんだこれ？", "romaji": "123456789hikino...nandakore?", "img": "creepy,eyes"}
+    ],
+    "15": [
+      {"kanji": "【<ruby>最強<rt>さいきょう</rt></ruby>の<ruby>猛獣<rt>もうじゅう</rt></ruby>】タスマニアデビル & サーバルキャット", "romaji": "[saikyounomouzyuu]tasumaniadebiru & sa-barukyakko", "img": "tasmaniandevil,serval"},
+      {"kanji": "【<ruby>驚異<rt>きょうい</rt></ruby>の<ruby>生命力<rt>せいめいりょく</rt></ruby>】クマムシ", "romaji": "[kyouinoseimeiryoku]kumamusi", "img": "tardigrade"},
+      {"kanji": "【<ruby>大型<rt>おおがた</rt></ruby>ネコ<ruby>科<rt>か</rt></ruby>】アムールトラ & アミメキリン", "romaji": "[oogatanekoka]amu-rutora & amimekirin", "img": "tiger,giraffe"},
+      {"kanji": "【<ruby>南米<rt>なんべい</rt></ruby>の<ruby>珍獣<rt>ちんじゅう</rt></ruby>】カピバラ & ナマケモノ", "romaji": "[nanbeinotinyuu]kapibara & namakemono", "img": "capybara,sloth"},
+      {"kanji": "【サバンナのハンター】ブチハイエナ & リカオン", "romaji": "[sabannanohanta-]butihaiena & rikaon", "img": "hyena,lycaon"},
+      {"kanji": "【<ruby>極地<rt>きょくち</rt></ruby>の<ruby>海獣<rt>かいじゅう</rt></ruby>】セイウチ & イッカク", "romaji": "[kyokutinokaijuu]seiuti & ikkaku", "img": "walrus,narwhal"},
+      {"kanji": "【<ruby>森<rt>もり</rt></ruby>の<ruby>智者<rt>ちしゃ</rt></ruby>】オランウータン & チンパンジー", "romaji": "[morinotisya]oranu-tan & tinpanzi-", "img": "orangutan,chimpanzee"},
+      {"kanji": "【<ruby>夜行性<rt>やこうせい</rt></ruby>ハンター】メンフクロウ & ムササビ", "romaji": "[yakouseihanta-]menfukurou & musasabi", "img": "barnowl,flyingsquirrel"},
+      {"kanji": "【<ruby>猛毒<rt>もうどく</rt></ruby>の<ruby>大トカゲ<rt>おおとかげ</rt></ruby>】コモドオオトカゲ", "romaji": "[moudokunoootokage]komodoootokage", "img": "komododragon"},
+      {"kanji": "★<ruby>動物<rt>どうぶつ</rt></ruby>エリア<ruby>制覇<rt>せいは</rt></ruby>：全<ruby>動物<rt>どうぶつ</rt></ruby>マスターおめでとう！", "romaji": "*doubutueriaseiha:zendoubutumasuta-omedetou!", "img": "champion,animals"}
+    ],
+    "16": [
+      {"kanji": "あさがお", "romaji": "asagao", "img": "morningglory,flower"},
+      {"kanji": "たんぽぽ", "romaji": "tanpopo", "img": "dandelion"},
+      {"kanji": "ひまわり", "romaji": "himawari", "img": "sunflower"},
+      {"kanji": "ちゅーりっぷ", "romaji": "tyuーrippu", "img": "tulip"},
+      {"kanji": "さくら", "romaji": "sakura", "img": "cherryblossom"},
+      {"kanji": "ばら", "romaji": "bara", "img": "rose"},
+      {"kanji": "ゆり", "romaji": "yuri", "img": "lily"},
+      {"kanji": "きく", "romaji": "kiku", "img": "chrysanthemum"},
+      {"kanji": "もも", "romaji": "momo", "img": "peachblossom"},
+      {"kanji": "うめ", "romaji": "ume", "img": "plumblossom"}
+    ],
+    "17": [
+      {"kanji": "<ruby>松<rt>まつ</rt></ruby>ぼっくり", "romaji": "matubokkuri", "img": "pinecone"},
+      {"kanji": "<ruby>竹林<rt>ちくりん</rt></ruby>のパンダ", "romaji": "tikurinnopanda", "img": "bamboo,panda"},
+      {"kanji": "<ruby>梅干<rt>うめぼ</rt></ruby>し", "romaji": "umebosi", "img": "pickledplum"},
+      {"kanji": "<ruby>白樺<rt>しらかば</rt></ruby>の<ruby>木<rt>き</rt></ruby>", "romaji": "sirakabanoki", "img": "birchtree"},
+      {"kanji": "イチョウの<ruby>葉<rt>は</rt></ruby>", "romaji": "ityounoha", "img": "ginkgoleaf"},
+      {"kanji": "ガジュマルの<ruby>根<rt>ね</rt></ruby>", "romaji": "gajumarunone", "img": "banyantree"},
+      {"kanji": "<ruby>楠<rt>くすのき</rt></ruby>(クスノキ)", "romaji": "kusunoki(kusunoki)", "img": "camphortree"},
+      {"kanji": "サボテン", "romaji": "saboten", "img": "cactus"},
+      {"kanji": "マングローブ", "romaji": "manguroーbu", "img": "mangrove"},
+      {"kanji": "<ruby>紅葉<rt>もみじ</rt></ruby>がり", "romaji": "momizigari", "img": "mapleleaf,autumn"}
+    ],
+    "18": [
+      {"kanji": "ヒマワリ（<ruby>大輪<rt>たいりん</rt></ruby>の<ruby>花<rt>はな</rt></ruby>）", "romaji": "himawari(tairinnohana)", "img": "sunflower"},
+      {"kanji": "#<ruby>満開<rt>まんかい</rt></ruby>のサクラ", "romaji": "#mankainosakura", "img": "cherryblossom"},
+      {"kanji": "*++<ruby>真<rt>ま</rt></ruby>っ<ruby>赤<rt>か</rt></ruby>なバラ++*", "romaji": "*++makkanabara++*", "img": "redrose"},
+      {"kanji": "サボテン @ <ruby>灼熱<rt>しゃくねつ</rt></ruby>の<ruby>砂漠<rt>さばく</rt></ruby>", "romaji": "saboten @ syakunetsunosabaku", "img": "cactus,desert"},
+      {"kanji": "100% <ruby>青々<rt>あおあお</rt></ruby>とした<ruby>竹林<rt>ちくりん</rt></ruby>", "romaji": "100% aoaotositatikurin", "img": "bambooforest"},
+      {"kanji": "［サボテン］＆［<ruby>多肉植物<rt>たにくしょくぶつ</rt></ruby>］", "romaji": "[saboten] & [tanikusyokubutu]", "img": "cactus,succulent"},
+      {"kanji": "“チューリップ”の<ruby>庭園<rt>ていえん</rt></ruby>", "romaji": "\"tyu-rippu\" no teien", "img": "tulipgarden"},
+      {"kanji": "リンゴの<ruby>木<rt>き</rt></ruby>: 100メートル", "romaji": "ringonoki: 100me-toru", "img": "appletree"},
+      {"kanji": "<ruby>美<rt>うつく</rt></ruby>しい＜<ruby>一輪<rt>いちりん</rt></ruby>の<ruby>花<rt>はな</rt></ruby>＞", "romaji": "utukusii <itirinnohana>", "img": "beautifulflower"},
+      {"kanji": "<ruby>松<rt>まつ</rt></ruby>・<ruby>竹<rt>たけ</rt></ruby>・<ruby>梅<rt>うめ</rt></ruby>", "romaji": "matu, take, ume", "img": "pine,bamboo,plum"}
+    ],
+    "19": [
+      {"kanji": "<ruby>彼岸花<rt>ひがんばな</rt></ruby>", "romaji": "higanbana", "img": "spiderlily"},
+      {"kanji": "<ruby>紫陽花<rt>あじさい</rt></ruby>", "romaji": "azisai", "img": "hydrangea"},
+      {"kanji": "<ruby>向日葵<rt>ひまわり</rt></ruby>", "romaji": "himawari", "img": "sunflower"},
+      {"kanji": "<ruby>蒲公英<rt>たんぽぽ</rt></ruby>", "romaji": "tanpopo", "img": "dandelion"},
+      {"kanji": "<ruby>竜胆<rt>りんどう</rt></ruby>", "romaji": "rindou", "img": "gentianflower"},
+      {"kanji": "<ruby>胡蝶蘭<rt>こちょうらん</rt></ruby>", "romaji": "kotyouran", "img": "phalaenopsis,orchid"},
+      {"kanji": "<ruby>月下美人<rt>げっかびじん</rt></ruby>", "romaji": "gekkabizin", "img": "epiphyllumoxypetalum"},
+      {"kanji": "<ruby>曼珠沙華<rt>まんじゅしゃげ</rt></ruby>", "romaji": "manzyusage", "img": "redspiderlily"},
+      {"kanji": "<ruby>勿忘草<rt>わすれなぐさ</rt></ruby>", "romaji": "wasurenagusa", "img": "forgetmenot"},
+      {"kanji": "<ruby>鈴蘭<rt>すずらん</rt></ruby>", "romaji": "suzuran", "img": "lilyofthevalley"}
+    ],
+    "20": [
+      {"kanji": "<ruby>食虫植物<rt>しょくちゅうしょくぶつ</rt></ruby>：ハエトリグサ & ウツボカズラ", "romaji": "syokutyuusyokubutu:haetorigusa & utubokazura", "img": "venusflytrap"},
+      {"kanji": "<ruby>世界一巨大<rt>せかいいちきょだい</rt></ruby>な<ruby>花<rt>はな</rt></ruby>：ラフレシア", "romaji": "sekaiitikyodainahana:rafuresia", "img": "rafflesia"},
+      {"kanji": "<ruby>水上<rt>すいじょう</rt></ruby>の<ruby>大葉<rt>おおば</rt></ruby>：オオオニバス", "romaji": "suijounoooba:ooonibasu", "img": "waterlily"},
+      {"kanji": "<ruby>世界一高<rt>せかいいちたか</rt></ruby>い<ruby>大木<rt>たいぼく</rt></ruby>：セコイア", "romaji": "sekaiiititakaitaiboku:sekoia", "img": "giantredwood"},
+      {"kanji": "<ruby>神秘<rt>しんぴ</rt></ruby>の<ruby>熱帯樹<rt>ねったいじゅ</rt></ruby>：ガジュマル", "romaji": "sinpinonettaiju:gajumaru", "img": "banyantree"},
+      {"kanji": "<ruby>砂漠<rt>さばく</rt></ruby>の<ruby>多肉植物<rt>たにくしょくぶつ</rt></ruby>：サボテン & アロエ", "romaji": "sabakunotanikusyokubutu:saboten & aroe", "img": "cactus,succulent"},
+      {"kanji": "<ruby>香水<rt>こうすい</rt></ruby>の<ruby>原料<rt>げんりょう</rt></ruby>：ジャスミン & ラベンダー", "romaji": "kousuinogenryou:jasumin & rabenda-", "img": "flowers"},
+      {"kanji": "<ruby>四季<rt>しき</rt></ruby>の<ruby>銘木<rt>めいぼく</rt></ruby>：ソメイヨシノ & モミジ", "romaji": "sikinomeiboku:someiyosino & momizi", "img": "cherryblossom,mapleleaf"},
+      {"kanji": "<ruby>南国<rt>なんごく</rt></ruby>の<ruby>果樹<rt>かじゅ</rt></ruby>：パパイア & マンゴー", "romaji": "nangokunokaju:papaia & mango-", "img": "fruit"},
+      {"kanji": "<ruby>高山植物<rt>こうざんしょくぶつ</rt></ruby>：コマクサ & エーデルワイス", "romaji": "kouzansyokubutu:komakusa & e-deruwaisu", "img": "flowerfield"}
+    ],
+    "21": [
+      {"kanji": "メンダコ", "romaji": "mendako", "img": "flapjackoctopus"},
+      {"kanji": "チョウチンアンコウ", "romaji": "tyoutinankou", "img": "anglerfish"},
+      {"kanji": "デメニギス", "romaji": "demenigisu", "img": "barreleyefish"},
+      {"kanji": "ラブカ", "romaji": "rabuka", "img": "frilledshark"},
+      {"kanji": "クリオネ (<ruby>流氷<rt>りゅうひょう</rt></ruby>の<ruby>天使<rt>てんし</rt></ruby>)", "romaji": "kurione(ryuuhyounotensi)", "img": "clione,seaangel"},
+      {"kanji": "ホウライエソ", "romaji": "houraieso", "img": "viperfish"},
+      {"kanji": "<ruby>深海<rt>しんかい</rt></ruby>のアイドル：リュウグウノツカイ", "romaji": "sinkainoaidoru:ryuuguunotukai", "img": "oarfish"},
+      {"kanji": "ウミウシ (<ruby>海<rt>うみ</rt></ruby>の<ruby>宝石<rt>ほうせき</rt></ruby>)", "romaji": "umiusi(uminohouseki)", "img": "nudibranch,seaslug"},
+      {"kanji": "アノマロカリス (<ruby>古代<rt>こだい</rt></ruby>の<ruby>海<rt>うみ</rt></ruby>)", "romaji": "anomarokarisu(kodainoumi)", "img": "anomalocaris"},
+      {"kanji": "ミツクリザメ (Goblin Shark)", "romaji": "mitukurizame(goblin shark)", "img": "goblinshark"}
+    ],
+    "22": [
+      {"kanji": "トリケラトプス", "romaji": "torikeratopusu", "img": "triceratops"},
+      {"kanji": "プテラノドン", "romaji": "puteranodon", "img": "pteranodon"},
+      {"kanji": "ステゴサウルス", "romaji": "sutegosaurusu", "img": "stegosaurus"},
+      {"kanji": "スピノサウルス", "romaji": "supinosaurusu", "img": "spinosaurus"},
+      {"kanji": "ブラキオサウルス", "romaji": "burakiosaurusu", "img": "brachiosaurus"},
+      {"kanji": "モササウルス (<ruby>海<rt>うみ</rt></ruby>の<ruby>王者<rt>おうじゃ</rt></ruby>)", "romaji": "mosasaurusu(uminoouja)", "img": "mosasaurus"},
+      {"kanji": "マンモス (Mammoth)", "romaji": "manmosu(mammoth)", "img": "mammoth"},
+      {"kanji": "サーベルタイガー", "romaji": "sa-berutaiga-", "img": "smilodon,sabertooth"},
+      {"kanji": "<ruby>始祖鳥<rt>しそちょう</rt></ruby>(シソチョウ)", "romaji": "sisotyou(sisotyou)", "img": "archaeopteryx"},
+      {"kanji": "<ruby>古代生物<rt>こだいせいぶつ</rt></ruby>の<ruby>化石<rt>かせき</rt></ruby>", "romaji": "kodaiseibutunokaseki", "img": "fossil,dinosaur"}
+    ],
+    "23": [
+      {"kanji": "ヘラクレスオオカブト", "romaji": "herakuresuookabuto", "img": "herculesbeetle"},
+      {"kanji": "コーカサスオオカブト", "romaji": "ko-kasasuookabuto", "img": "caucasusbeetle"},
+      {"kanji": "ギラファノコギリクワガタ", "romaji": "girafanokogirikuwagata", "img": "stagbeetle"},
+      {"kanji": "オニヤンマ", "romaji": "oniyanma", "img": "dragonfly"},
+      {"kanji": "ミジンコ", "romaji": "mizinko", "img": "daphnia,waterflea"},
+      {"kanji": "ゾウリムシ", "romaji": "zourimusi", "img": "paramecium"},
+      {"kanji": "ミドリムシ (ユーグレナ)", "romaji": "midorimusi(yu-gurena)", "img": "euglena"},
+      {"kanji": "ハキリアリの<ruby>大行列<rt>だいぎょうれつ</rt></ruby>", "romaji": "hakiriarinodaigyouretu", "img": "leafcutterant"},
+      {"kanji": "プラナリア (<ruby>再生能力<rt>さいせいのうりょく</rt></ruby>)", "romaji": "puranaria(saiseinouryoku)", "img": "planaria"},
+      {"kanji": "アリジゴク (ウスバカゲロウの<ruby>幼虫<rt>ようちゅう</rt></ruby>)", "romaji": "arizigoku(usubakagerounoyoutyuu)", "img": "antlion"}
+    ],
+    "24": [
+      {"kanji": "ドラゴン (Dragon)", "romaji": "doragon(dragon)", "img": "dragon"},
+      {"kanji": "フェニックス (<ruby>不死鳥<rt>ふしちょう</rt></ruby>)", "romaji": "fenikkusu(fusityou)", "img": "phoenix,bird"},
+      {"kanji": "ユニコーン (<ruby>一角獣<rt>いっかくじゅう</rt></ruby>)", "romaji": "yuniko-n(ikkakujuu)", "img": "unicorn"},
+      {"kanji": "クラーケン (<ruby>海<rt>うみ</rt></ruby>の<ruby>怪物<rt>かいぶつ</rt></ruby>)", "romaji": "kura-ken(uminokaibutu)", "img": "kraken,monster"},
+      {"kanji": "ペガサス (<ruby>天馬<rt>てんま</rt></ruby>)", "romaji": "pegasasu(tenma)", "img": "pegasus"},
+      {"kanji": "ネッシー (ネス<ruby>湖<rt>こ</rt></ruby>の<ruby>謎<rt>なぞ</rt></ruby>)", "romaji": "nesshi-(nesukononazo)", "img": "lochnessmonster"},
+      {"kanji": "ビッグフット (Bigfoot)", "romaji": "biggufutto(bigfoot)", "img": "bigfoot,sasquatch"},
+      {"kanji": "チュパカブラ", "romaji": "tyupakabura", "img": "chupacabra"},
+      {"kanji": "ケルベロス (<ruby>地獄<rt>じごく</rt></ruby>の<ruby>番犬<rt>ばんけん</rt></ruby>)", "romaji": "keruberosu(zigokunobanken)", "img": "cerberus"},
+      {"kanji": "ツチノコ<ruby>発見<rt>はっけん</rt></ruby>！？", "romaji": "tutinokohakken!?", "img": "cryptid,snake"}
+    ],
+    "25": [
+      {"kanji": "<ruby>陸上最強<rt>りくじょうさいきょう</rt></ruby>：アフリカゾウ & シロサイ", "romaji": "rikujousaikyou:afurikazou & sirosai", "img": "elephant,rhino"},
+      {"kanji": "<ruby>地球最大<rt>ちきゅうさいだい</rt></ruby>：シロナガスクジラ", "romaji": "tikyuusaidai:sironagasukujira", "img": "bluewhale"},
+      {"kanji": "<ruby>古代<rt>こだい</rt></ruby>の<ruby>覇者<rt>はしゃ</rt></ruby>：ティラノサウルス vs スピノサウルス", "romaji": "kodainohasya:tiranosaurusu vs supinosaurusu", "img": "trex,spinosaurus"},
+      {"kanji": "<ruby>深海<rt>しんかい</rt></ruby>の<ruby>怪物<rt>かいぶつ</rt></ruby>：リュウグウノツカイ & ダイオウグソクムシ", "romaji": "sinkainokaibutu:ryuuguunotukai & daiougusokumusi", "img": "oarfish,giantisopod"},
+      {"kanji": "<ruby>甲虫<rt>こうちゅう</rt></ruby>の<ruby>王様<rt>おうさま</rt></ruby>：ヘラクレスオオカブト & ギラファノコギリクワガタ", "romaji": "koutyuunoousama:herakuresuookabuto & girafanokogirikuwagata", "img": "herculesbeetle,stagbeetle"},
+      {"kanji": "<ruby>伝説<rt>でんせつ</rt></ruby>の<ruby>幻獣<rt>げんじゅう</rt></ruby>：ドラゴン & フェニックス", "romaji": "densetunogenzyuu:doragon & fenikkusu", "img": "dragon,phoenix"},
+      {"kanji": "<ruby>華麗<rt>かれい</rt></ruby>なる<ruby>名花<rt>めいか</rt></ruby>：ラフレシア & 月下美人", "romaji": "kareinarumeika:rafuresia & gekkabizin", "img": "rafflesia,flower"},
+      {"kanji": "<ruby>猛毒<rt>もうどく</rt></ruby>の<ruby>生息者<rt>せいそくしゃ</rt></ruby>：キングコブラ & ハブクラゲ", "romaji": "moudokunoseisokusya:kingukobura & habukurage", "img": "cobra,jellyfish"},
+      {"kanji": "<ruby>氷海<rt>ひょうかい</rt></ruby>の<ruby>天使<rt>てんし</rt></ruby>：クリオネ & コウテイペンギン", "romaji": "hyoukainotensi:kurione & kouteipengin", "img": "clione,emperorpenguin"},
+      {"kanji": "★<ruby>真<rt>しん</rt></ruby>の<ruby>生物王<rt>せいぶつおう</rt></ruby>：全25レベルクリアおめでとう！", "romaji": "*sinnoseibutuou:zen25reberukuriaomedetou!", "img": "champion,king"}
+    ]
+  };
+
+  const levels = Object.keys(typingData);
+  let currentLevel = "1";
+  let currentQuestionIndex = 0;
+  let currentCharIndex = 0;
+  let isPlaying = false;
+  let timerInterval = null;
+  let timeLeft = 60;
+  
+  // LocalStorageからクリアデータを取得
+  let clearedLevels = JSON.parse(localStorage.getItem('clearedLevels')) || [];
+
+  const levelSelector = document.getElementById('level-selector');
+  const statusEl = document.getElementById('status');
+  const timerDisplay = document.getElementById('timer-display');
+  const wordDisplay = document.getElementById('word-display');
+  const romajiDisplay = document.getElementById('romaji-display');
+  const typeInput = document.getElementById('type-input');
+  const btnNext = document.getElementById('btn-next');
+
+  function getMaxVisibleLevel() {
+    if (clearedLevels.some(l => parseInt(l) >= 20)) return 25;
+    if (clearedLevels.some(l => parseInt(l) >= 15)) return 20;
+    if (clearedLevels.some(l => parseInt(l) >= 10)) return 15;
+    return 10;
+  }
+
+  function init() {
+    // 最後に遊んだレベルを復元
+    const savedLevel = localStorage.getItem('lastPlayedLevel');
+    if (savedLevel && levels.includes(savedLevel)) {
+      currentLevel = savedLevel;
+    }
+
+    // 表示可能なレベルを超えている場合は1に戻す
+    const maxVisible = getMaxVisibleLevel();
+    if (parseInt(currentLevel) > maxVisible) {
+      currentLevel = "1";
+      localStorage.setItem('lastPlayedLevel', currentLevel);
+    }
+
+    renderLevelButtons();
+    updateStatusReady();
+    
+    // 画面のどこをクリックしても入力欄にフォーカスを当てる（ゲーム中のみ）
+    document.body.addEventListener('click', () => {
+      if (isPlaying) typeInput.focus();
+    });
+  }
+
+  function renderLevelButtons() {
+    levelSelector.innerHTML = '';
+    const maxVisible = getMaxVisibleLevel();
+
+    levels.forEach(level => {
+      if (parseInt(level) > maxVisible) return; // まだ解放されていないレベルは非表示
+
+      const btn = document.createElement('button');
+      btn.className = 'level-btn';
+      if (level === currentLevel) btn.classList.add('active');
+      if (clearedLevels.includes(level)) btn.classList.add('cleared');
+      btn.textContent = `レベル ${level}`;
+      btn.onclick = () => {
+        if (isPlaying) return; // プレイ中はレベル変更不可
+        currentLevel = level;
+        localStorage.setItem('lastPlayedLevel', currentLevel);
+        renderLevelButtons();
+        updateStatusReady();
+        startGame();
+      };
+      levelSelector.appendChild(btn);
+    });
+  }
+
+  function updateStatusReady() {
+    clearInterval(timerInterval);
+    timerDisplay.style.display = 'none';
+    statusEl.textContent = `レベル ${currentLevel} を選んでいます`;
+    wordDisplay.innerHTML = 'ボタンを押してスタート！';
+    romajiDisplay.innerHTML = '&nbsp;';
+    typeInput.value = '';
+    typeInput.disabled = true;
+    btnNext.style.display = 'none';
+  }
+
+  function startGame() {
+    isPlaying = true;
+    currentQuestionIndex = 0;
+    currentCharIndex = 0;
+    typeInput.disabled = false;
+    typeInput.focus();
+    btnNext.style.display = 'none';
+    showQuestion();
+  }
+
+  function showQuestion() {
+    clearInterval(timerInterval);
+    
+    if (parseInt(currentLevel) >= 21) {
+      timeLeft = currentLevel === "25" ? 50 : 60;
+      timerDisplay.style.display = 'block';
+      updateTimerDisplay();
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        updateTimerDisplay();
+        if (timeLeft <= 0) {
+          timeUp();
+        }
+      }, 1000);
+    } else {
+      timerDisplay.style.display = 'none';
+    }
+
+    const wordObj = typingData[currentLevel][currentQuestionIndex];
+    statusEl.textContent = `レベル ${currentLevel} - 問題 ${currentQuestionIndex + 1} / ${typingData[currentLevel].length}`;
+    wordDisplay.innerHTML = wordObj.kanji;
+    
+    // 背景画像を設定
+    updateBackgroundImage(wordObj.img || 'nature');
+    
+    currentCharIndex = 0;
+    updateRomajiDisplay();
+  }
+
+  function updateTimerDisplay() {
+    timerDisplay.textContent = `⏳ 残り時間: ${timeLeft}秒`;
+    if (timeLeft <= 10) {
+      timerDisplay.style.color = '#ff0000';
+      if (timeLeft % 2 === 0) {
+        timerDisplay.style.transform = 'scale(1.1)';
+      } else {
+        timerDisplay.style.transform = 'scale(1)';
+      }
+    } else {
+      timerDisplay.style.color = 'var(--correct-color)';
+      timerDisplay.style.transform = 'scale(1)';
+    }
+  }
+
+  function timeUp() {
+    clearInterval(timerInterval);
+    isPlaying = false;
+    typeInput.disabled = true;
+    wordDisplay.innerHTML = '⏰ タイムアップ！ ⏰<br><span style="font-size:20px; color:#ff4757;">もう一度レベルの最初からやり直してね</span>';
+    romajiDisplay.innerHTML = '&nbsp;';
+    
+    btnNext.textContent = 'もう一度挑戦する';
+    btnNext.style.display = 'inline-block';
+    btnNext.onclick = startGame;
+  }
+
+  async function updateBackgroundImage(keyword) {
+    const bgEl = document.getElementById('bg-image');
+    try {
+      // 最初のキーワードを取り出す（例: "ayu,fish" -> "ayu"）
+      const searchKeyword = keyword.split(',')[0].trim();
+      const res = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${searchKeyword}`);
+      if (!res.ok) throw new Error('Not found');
+      const data = await res.json();
+      if (data.originalimage && data.originalimage.source) {
+        bgEl.style.backgroundImage = `url('${data.originalimage.source}')`;
+        return;
+      }
+      if (data.thumbnail && data.thumbnail.source) {
+        bgEl.style.backgroundImage = `url('${data.thumbnail.source}')`;
+        return;
+      }
+      throw new Error('No image in Wikipedia');
+    } catch (e) {
+      // Wikipediaで見つからなかった場合はloremflickrにフォールバック
+      bgEl.style.backgroundImage = `url('https://loremflickr.com/1280/720/${keyword}')`;
+    }
+  }
+
+  function escapeHTML(str) {
+    return str.replace(/&/g, '&amp;')
+              .replace(/</g, '&lt;')
+              .replace(/>/g, '&gt;');
+  }
+
+  function applyDynamicRomaji(wordObj, currentIndex, inputKey) {
+    const romaji = wordObj.romaji;
+    const typed = romaji.substring(0, currentIndex).toLowerCase();
+    const untyped = romaji.substring(currentIndex).toLowerCase();
+    const inKey = inputKey.toLowerCase();
+    
+    if (inKey === 'n' && typed.endsWith('n') && !typed.endsWith('nn') && untyped.length > 0) {
+      const nextChar = untyped[0];
+      const vowelsAndY = ['a','i','u','e','o','y','n'];
+      if (!vowelsAndY.includes(nextChar)) {
+        wordObj.romaji = romaji.substring(0, currentIndex) + 'n' + romaji.substring(currentIndex);
+        return;
+      }
+    }
+
+    const alts = [
+      ['si', 'shi'], ['shi', 'si'],
+      ['ti', 'chi'], ['chi', 'ti'],
+      ['tu', 'tsu'], ['tsu', 'tu'],
+      ['hu', 'fu'],  ['fu', 'hu'],
+      ['zi', 'ji'],  ['ji', 'zi'],
+      ['sya', 'sha'], ['sha', 'sya'],
+      ['syu', 'shu'], ['shu', 'syu'],
+      ['syo', 'sho'], ['sho', 'syo'],
+      ['tya', 'cha'], ['cha', 'tya'],
+      ['tyu', 'chu'], ['chu', 'tyu'],
+      ['tyo', 'cho'], ['cho', 'tyo'],
+      ['zya', 'ja'],  ['ja', 'zya'],
+      ['zyu', 'ju'],  ['ju', 'zyu'],
+      ['zyo', 'jo'],  ['jo', 'zyo'],
+      ['zya', 'jya'], ['jya', 'zya'],
+      ['zyu', 'jyu'], ['jyu', 'zyu'],
+      ['zyo', 'jyo'], ['jyo', 'zyo'],
+      ['ja', 'jya'],  ['jya', 'ja'],
+      ['ju', 'jyu'],  ['jyu', 'ju'],
+      ['jo', 'jyo'],  ['jyo', 'jo']
+    ];
+
+    for (let i = 0; i < alts.length; i++) {
+      const orig = alts[i][0];
+      const alt = alts[i][1];
+      for (let L = 0; L < orig.length; L++) {
+        const origPrefix = orig.substring(0, L);
+        const origSuffix = orig.substring(L);
+        if (typed.endsWith(origPrefix) && untyped.startsWith(origSuffix)) {
+          if (alt.startsWith(origPrefix) && alt[L] === inKey) {
+            wordObj.romaji = romaji.substring(0, currentIndex - L) + alt + romaji.substring(currentIndex + origSuffix.length);
+            return;
+          }
+        }
+      }
+    }
+  }
+
+  function updateRomajiDisplay() {
+    const wordObj = typingData[currentLevel][currentQuestionIndex];
+    const romaji = wordObj.romaji;
+    
+    // 空白（スペース）を記号「␣」に変換して視覚的にわかりやすくする
+    const displayRomaji = romaji.replace(/ /g, '␣');
+    
+    const typed = displayRomaji.substring(0, currentCharIndex);
+    const untyped = displayRomaji.substring(currentCharIndex);
+    
+    const escTyped = escapeHTML(typed);
+
+    if (parseInt(currentLevel) >= 7) {
+      // 未入力の文字は「*」にするが、「␣」だけはそのまま表示する
+      const hiddenUntyped = untyped.split('').map(c => c === '␣' ? '␣' : '*').join('');
+      const escHidden = escapeHTML(hiddenUntyped);
+      romajiDisplay.innerHTML = `<span class="typed">${escTyped}</span><span class="untyped" style="opacity: 0.3;">${escHidden}</span>`;
+    } else {
+      const escUntyped = escapeHTML(untyped);
+      romajiDisplay.innerHTML = `<span class="typed">${escTyped}</span><span class="untyped">${escUntyped}</span>`;
+    }
+    // 実際の入力欄には本来の文字列を入れる
+    typeInput.value = romaji.substring(0, currentCharIndex);
+  }
+
+  // キー入力を監視
+  typeInput.addEventListener('keydown', (e) => {
+    if (!isPlaying) return;
+    
+    // 修飾キーやIMEなどの単一文字以外の入力は無視
+    if (e.key.length !== 1 || e.ctrlKey || e.metaKey || e.altKey) return;
+    
+    e.preventDefault(); // デフォルトの入力を防ぎ、自前で管理する
+
+    let inputKey = e.key;
+    // 全角記号や英数字を半角に変換
+    inputKey = inputKey.replace(/[！-～]/g, function(s) {
+      return String.fromCharCode(s.charCodeAt(0) - 0xFEE0);
+    });
+    // その他のよくある全角記号を個別に半角化
+    if (inputKey === '”') inputKey = '"';
+    if (inputKey === '’') inputKey = "'";
+    if (inputKey === '‘') inputKey = "`";
+    if (inputKey === '￥') inputKey = '\\';
+    if (inputKey === '　') inputKey = ' ';
+    if (inputKey === '〜') inputKey = '~';
+
+    const wordObj = typingData[currentLevel][currentQuestionIndex];
+    
+    // ダイナミックローマ字変換（si/shi などの揺れを吸収）
+    applyDynamicRomaji(wordObj, currentCharIndex, inputKey);
+
+    const targetChar = wordObj.romaji[currentCharIndex];
+
+    // ハイフンと伸ばし棒を同一視する
+    let isCorrect = false;
+    if (inputKey.toLowerCase() === targetChar.toLowerCase()) {
+      isCorrect = true;
+    } else if (targetChar === 'ー' && (inputKey === '-' || inputKey === '−' || inputKey === '―' || inputKey === '‐')) {
+      isCorrect = true;
+    } else if (targetChar === '-' && (inputKey === 'ー' || inputKey === '−' || inputKey === '―' || inputKey === '‐')) {
+      isCorrect = true;
+    }
+
+    if (isCorrect) {
+      // 正解
+      currentCharIndex++;
+      updateRomajiDisplay();
+      
+      // 単語クリア判定
+      if (currentCharIndex === wordObj.romaji.length) {
+        setTimeout(nextQuestion, 150); // 少し待ってから次の問題へ
+      }
+    } else {
+      // 不正解
+      typeInput.classList.remove('shake');
+      void typeInput.offsetWidth; // アニメーションをリセットするためのハック
+      typeInput.classList.add('shake');
+    }
+  });
+
+  function nextQuestion() {
+    currentQuestionIndex++;
+    if (currentQuestionIndex >= typingData[currentLevel].length) {
+      levelClear();
+    } else {
+      showQuestion();
+    }
+  }
+
+  function levelClear() {
+    clearInterval(timerInterval);
+    timerDisplay.style.display = 'none';
+    isPlaying = false;
+    typeInput.disabled = true;
+    
+    // クリアデータを保存
+    if (!clearedLevels.includes(currentLevel)) {
+      clearedLevels.push(currentLevel);
+      localStorage.setItem('clearedLevels', JSON.stringify(clearedLevels));
+    }
+    
+    renderLevelButtons();
+
+    statusEl.textContent = `レベル ${currentLevel} クリア！`;
+    wordDisplay.innerHTML = '🎉 素晴らしい！ 🎉';
+    romajiDisplay.innerHTML = '&nbsp;';
+    
+    if (clearedLevels.length === levels.length) {
+      wordDisplay.innerHTML = '👑 全クリアおめでとう！ 👑<br><span style="font-size:20px; color:#9ca3af;">すべての生き物をマスターしたね！</span>';
+      showConfetti();
+    } else {
+      // 次のレベルへ進むボタンを表示
+      const nextLevelIndex = levels.indexOf(currentLevel) + 1;
+      if (nextLevelIndex < levels.length) {
+        btnNext.textContent = `レベル ${levels[nextLevelIndex]} へ進む`;
+        btnNext.style.display = 'inline-block';
+        btnNext.onclick = () => {
+          currentLevel = levels[nextLevelIndex];
+          localStorage.setItem('lastPlayedLevel', currentLevel);
+          renderLevelButtons();
+          startGame();
+        };
+      }
+    }
+  }
+
+  function showConfetti() {
+    const colors = ['#ff8fa3', '#a0c4ff', '#ffd166', '#06d6a0', '#118ab2', '#ff9f43'];
+    for (let i = 0; i < 150; i++) {
+      const confetti = document.createElement('div');
+      confetti.classList.add('confetti');
+      confetti.style.left = Math.random() * 100 + 'vw';
+      confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
+      confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+      
+      // ランダムなサイズと回転
+      const size = Math.random() * 10 + 5;
+      confetti.style.width = size + 'px';
+      confetti.style.height = size + 'px';
+      
+      document.body.appendChild(confetti);
+      
+      // アニメーション終了後に要素を削除
+      setTimeout(() => confetti.remove(), 5000);
+    }
+  }
+
+  // ESCキーでゲームを中断してレベル選択に戻る
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && isPlaying) {
+      isPlaying = false;
+      updateStatusReady();
+      renderLevelButtons();
+    }
+  });
+
+  // データ初期化ボタン
+  document.getElementById('btn-reset').addEventListener('click', () => {
+    if (confirm('クリアしたレベルのデータをすべて初期化しますか？\n（この操作は取り消せません）')) {
+      localStorage.removeItem('clearedLevels');
+      localStorage.removeItem('lastPlayedLevel');
+      location.reload();
+    }
+  });
+
+  // 初期化
+  init();
+</script>
+</body>
+</html>
